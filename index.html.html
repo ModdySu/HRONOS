@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>π.Σ.Κ.Δ. Протокол</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Share+Tech+Mono&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #000;
+            color: #0af;
+            font-family: 'Share Tech Mono', monospace;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+            position: relative;
+            padding: 20px;
+            background-image:
+                radial-gradient(circle at 15% 50%, rgba(0, 50, 100, 0.15) 0%, transparent 20%),
+                radial-gradient(circle at 85% 30%, rgba(10, 80, 150, 0.1) 0%, transparent 20%);
+        }
+
+        /* Эффект статического шума */
+        #static-noise {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            opacity: 0.03;
+            z-index: 100;
+            background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.8'/%3E%3C/svg%3E");
+        }
+
+        /* Контейнер */
+        .container {
+            position: relative;
+            z-index: 2;
+            text-align: center;
+            max-width: 900px;
+            width: 100%;
+            border: 1px solid rgba(0, 170, 255, 0.3);
+            padding: 30px;
+            background-color: rgba(0, 10, 25, 0.7);
+            backdrop-filter: blur(5px);
+            box-shadow: 0 0 40px rgba(0, 100, 255, 0.2);
+        }
+
+        /* Глючный заголовок */
+        .header {
+            margin-bottom: 40px;
+            position: relative;
+        }
+
+        .protocol-name {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 900;
+            font-size: 2.8rem;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: #0ff;
+            margin-bottom: 10px;
+            text-shadow: 0 0 10px #0ff;
+            animation: flicker 7s infinite alternate;
+        }
+
+        .protocol-subtitle {
+            font-size: 1.1rem;
+            letter-spacing: 0.2em;
+            color: #8af;
+            opacity: 0.8;
+            border-top: 1px solid rgba(0, 170, 255, 0.4);
+            border-bottom: 1px solid rgba(0, 170, 255, 0.4);
+            padding: 8px 0;
+            margin-top: 10px;
+        }
+
+        /* Основной счетчик процентов */
+        .progress-section {
+            margin: 50px 0;
+        }
+
+        .percentage-label {
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            color: #7cf;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .percentage-container {
+            position: relative;
+            height: 120px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+
+        .percentage-value {
+            font-family: 'Orbitron', sans-serif;
+            font-weight: 700;
+            font-size: 5.5rem;
+            color: #0f0;
+            text-shadow: 0 0 20px #0f0;
+            position: relative;
+            z-index: 3;
+            transition: all 0.5s;
+        }
+
+        /* Полоса прогресса */
+        .progress-bar {
+            width: 100%;
+            height: 4px;
+            background-color: rgba(0, 100, 200, 0.2);
+            margin: 30px 0 50px 0;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            position: absolute;
+            top: 0;
+            left: 0;
+            height: 100%;
+            background: linear-gradient(90deg, #00aaff, #00ffaa);
+            width: 0%;
+            transition: width 1s ease;
+            box-shadow: 0 0 10px #0af;
+        }
+
+        /* Таймер */
+        .timer-section {
+            margin: 40px 0;
+        }
+
+        .timer-label {
+            font-size: 1rem;
+            letter-spacing: 0.2em;
+            color: #aaf;
+            margin-bottom: 20px;
+            text-transform: uppercase;
+        }
+
+        .timer {
+            font-family: 'Orbitron', sans-serif;
+            font-size: 2.2rem;
+            color: #ffaa00;
+            text-shadow: 0 0 10px #ffaa00;
+            letter-spacing: 0.1em;
+        }
+
+        /* Загадочные сообщения */
+        .log-section {
+            margin-top: 50px;
+            border-top: 1px dashed rgba(0, 170, 255, 0.5);
+            padding-top: 30px;
+            min-height: 250px;
+            position: relative;
+        }
+
+        .log-title {
+            font-size: 1rem;
+            color: #8cf;
+            margin-bottom: 20px;
+            letter-spacing: 0.2em;
+        }
+
+        #log-container {
+            text-align: left;
+            font-size: 0.9rem;
+            color: #6af;
+            line-height: 1.5;
+            max-height: 200px;
+            overflow-y: auto;
+            padding-right: 10px;
+        }
+
+        .log-line {
+            margin: 8px 0;
+            opacity: 0.9;
+            animation: fadeIn 0.5s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 0.9; transform: translateY(0); }
+        }
+
+        .log-line.important {
+            color: #f66;
+            animation: pulse 2s infinite;
+        }
+
+        .log-line.system {
+            color: #0f0;
+        }
+
+        .log-line.warning {
+            color: #ffaa00;
+        }
+
+        .log-line.anomaly {
+            color: #ff00ff;
+            font-style: italic;
+        }
+
+        .log-line.event {
+            color: #00ffff;
+            border-left: 2px solid #00ffff;
+            padding-left: 10px;
+        }
+
+        /* Футер */
+        .footer {
+            margin-top: 50px;
+            font-size: 0.8rem;
+            color: #558;
+            letter-spacing: 0.1em;
+            border-top: 1px solid rgba(0, 50, 100, 0.5);
+            padding-top: 20px;
+            opacity: 0.7;
+        }
+
+        /* Анимации */
+        @keyframes flicker {
+            0%, 19%, 21%, 23%, 25%, 54%, 56%, 100% {
+                opacity: 1;
+                text-shadow: 0 0 10px #0ff, 0 0 20px #0ff;
+            }
+            20%, 24%, 55% {
+                opacity: 0.7;
+                text-shadow: none;
+            }
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 0.7; }
+            50% { opacity: 1; }
+        }
+
+        @keyframes glitch {
+            0% { transform: translate(0); }
+            20% { transform: translate(-2px, 2px); }
+            40% { transform: translate(-2px, -2px); }
+            60% { transform: translate(2px, 2px); }
+            80% { transform: translate(2px, -2px); }
+            100% { transform: translate(0); }
+        }
+
+        .glitch {
+            animation: glitch 0.3s infinite;
+        }
+
+        /* Эффект сканирующей линии */
+        .scan-line {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background: linear-gradient(to bottom, transparent, rgba(0, 255, 255, 0.6), transparent);
+            z-index: 1;
+            animation: scan 8s linear infinite;
+            opacity: 0.3;
+        }
+
+        @keyframes scan {
+            0% { top: 0%; }
+            100% { top: 100%; }
+        }
+
+        /* Мобильная адаптация */
+        @media (max-width: 768px) {
+            .protocol-name {
+                font-size: 1.8rem;
+                letter-spacing: 0.2em;
+            }
+            .percentage-value {
+                font-size: 4rem;
+            }
+            .timer {
+                font-size: 1.8rem;
+            }
+            .container {
+                padding: 20px 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div id="static-noise"></div>
+    <div class="scan-line"></div>
+
+    <div class="container">
+        <div class="header">
+            <h1 class="protocol-name" id="protocol-title">π.Σ.Κ.Δ</h1>
+            <div class="protocol-subtitle">ПРОТОКОЛ НАБЛЮДЕНИЯ И СИНХРОНИЗАЦИИ</div>
+        </div>
+
+        <div class="progress-section">
+            <div class="percentage-label">ЗАВЕРШЕНИЕ ЦИКЛА ПЕРЕСЧЕТА</div>
+            <div class="percentage-container">
+                <div class="percentage-value" id="percentage">00.0%</div>
+            </div>
+            <div class="progress-bar">
+                <div class="progress-fill" id="progress-fill"></div>
+            </div>
+        </div>
+
+        <div class="timer-section">
+            <div class="timer-label">ДО НАЧАЛА СИНТАКСИЧЕСКОЙ КОРРЕКЦИИ</div>
+            <div class="timer" id="timer">--:--:--</div>
+        </div>
+
+        <div class="log-section">
+            <div class="log-title">>> СИСТЕМНЫЙ ЖУРНАЛ [ТИХИЙ РЕЖИМ]</div>
+            <div id="log-container">
+                <div class="log-line system">> Система наблюдения активна. Помехи в пределах нормы.</div>
+                <div class="log-line">> Стартовая точка отсчета: [ДАННЫЕ СКРЫТЫ]</div>
+                <div class="log-line">> Конечная точка синхронизации: [ДАННЫЕ СКРЫТЫ]</div>
+            </div>
+        </div>
+
+        <div class="footer">
+            СИСТЕМА ПАССИВНОГО МОНИТОРИНГА АНОМАЛИЙ v.4.07<br>
+            НЕ ПРЕДПРИНИМАЙТЕ ПОПЫТОК ВМЕШАТЕЛЬСТВА. ЭТО БЕЗОПАСНО.
+        </div>
+    </div>
+
+    <script>
+        // Даты начала и конца
+        const startDate = new Date('2025-12-16T00:00:00');
+        const endDate = new Date('2026-01-02T00:00:00');
+
+        // Элементы DOM
+        const percentageEl = document.getElementById('percentage');
+        const progressFillEl = document.getElementById('progress-fill');
+        const timerEl = document.getElementById('timer');
+        const protocolTitle = document.getElementById('protocol-title');
+        const logContainer = document.getElementById('log-container');
+
+        // Базы данных комментариев
+        const randomComments = [
+            "> Фоновый шум: 3.7Hz. В пределах нормы.",
+            "> Датчики фиксируют слабые колебания в подпространстве.",
+            "> Матрица синхронизации стабильна.",
+            "> Внешние наблюдатели: 0. Подтверждено.",
+            "> Темпоральный дрейф: минимальный.",
+            "> Проверка целостности данных... пройдена.",
+            "> Энтропия системы: 0.87. Норма.",
+            "> Квантовые помехи: игнорируются.",
+            "> Субпространственные аномалии не обнаружены.",
+            "> Система самотестирования активна.",
+            "> Архивация логов: каждые 24 часа.",
+            "> Резервное копирование выполнено.",
+            "> Защита от вмешательства: активна.",
+            "> Протокол невмешательства соблюдается.",
+            "> Частота выборки: 1Hz.",
+            "> Калибровка часов: автоматическая.",
+            "> Мониторинг метрики: постоянный.",
+            "> Подсистема анализа: в режиме ожидания.",
+            "> Нулевой уровень угрозы.",
+            "> Фрактальные паттерны: стабильны.",
+            "> Гравитационные волны: фоновые.",
+            "> Хронологический континуум: целостен.",
+            "> Вероятностные поля: в норме.",
+            "> Резонанс каузальности: отсутствует.",
+            "> Вектор перехода: вычисляется..."
+        ];
+
+        const warningComments = [
+            "> ПРЕДУПРЕЖДЕНИЕ: Ускорение процесса обнаружено.",
+            "> ВНИМАНИЕ: Изменения носят необратимый характер.",
+            "> УГРОЗА: Параметры системы переписываются.",
+            "> ТРЕВОГА: Наблюдаемое стремится к сингулярности.",
+            "> КРИТИЧЕСКОЕ СОБЫТИЕ: Пересчет констант.",
+            "> ОПАСНОСТЬ: Нарушение причинности возможно.",
+            "> АВАРИЙНЫЙ РЕЖИМ: Подготовка к переходу.",
+            "> СБОЙ: Локальные искажения реальности.",
+            "> КАТАСТРОФА: Разрыв шаблона неизбежен.",
+            "> АНОМАЛИЯ: Временные петли возможны."
+        ];
+
+        const anomalyComments = [
+            "> Обнаружены гравитационные аномалии...",
+            "> Хронологический сдвиг: +0.003 секунды.",
+            "> Квантовая неопределенность возрастает.",
+            "> Подпространственный резонанс...",
+            "> Темпоральные волны: амплитуда увеличивается.",
+            "> Парадоксы: вероятность 0.07%...",
+            "> Многовариантность будущего: активирована.",
+            "> Каузальные связи перестраиваются...",
+            "> Реальность теряет целостность...",
+            "> Наблюдатель влияет на наблюдаемое..."
+        ];
+
+        // Триггерные проценты и сообщения
+        const triggerMessages = {
+            5: {type: "event", text: ">> СОБЫТИЕ: Инициализация протокола завершена. Система готова."},
+            12: {type: "event", text: ">> СОБЫТИЕ: Первые признаки хронологического дрейфа зафиксированы."},
+            25: {type: "warning", text: ">> ПРЕДУПРЕЖДЕНИЕ: Критическая точка 25% пройдена. Процесс ускоряется."},
+            33: {type: "anomaly", text: ">> АНОМАЛИЯ: Темпоральные искажения достигают 0.33Δ. Мониторинг усилен."},
+            42: {type: "event", text: ">> СОБЫТИЕ: Ответ на главный вопрос получен. Значение: [СКРЫТО]."},
+            50: {type: "warning", text: ">> КРИТИЧЕСКОЕ СОБЫТИЕ: Половина пути пройдена. Точка невозврата приближается."},
+            66: {type: "anomaly", text: ">> АНОМАЛИЯ: Двухтретий порог. Реальность становится пластичной."},
+            75: {type: "warning", text: ">> ТРЕВОГА: 75% завершения. Физические константы проявляют нестабильность."},
+            88: {type: "event", text: ">> СОБЫТИЕ: Двойная бесконечность достигнута. Финальная фаза."},
+            90: {type: "warning", text: ">> КРИТИЧЕСКОЕ ПРЕДУПРЕЖДЕНИЕ: 90%. Подготовка к синтаксической коррекции."},
+            95: {type: "anomaly", text: ">> АНОМАЛИЯ: 95%. Границы реальности размываются. Конец неизбежен."},
+            99: {type: "event", text: ">> ФИНАЛЬНОЕ СОБЫТИЕ: 99%. Момент перехода. Прощайте, старая парадигма."},
+            100: {type: "system", text: ">> СИСТЕМА: КОРРЕКЦИЯ НАЧАЛАСЬ. ПРОТОКОЛ ЗАВЕРШЕН."}
+        };
+
+        // Отслеживание уже показанных триггеров
+        const shownTriggers = new Set();
+        let lastPercentage = 0;
+
+        // Функция для добавления комментария в лог
+        function addLogMessage(text, type = "") {
+            const logLine = document.createElement('div');
+            logLine.className = `log-line ${type}`;
+            logLine.textContent = text;
+            
+            logContainer.appendChild(logLine);
+            
+            // Ограничиваем количество строк в логе
+            const maxLines = 15;
+            while (logContainer.children.length > maxLines) {
+                logContainer.removeChild(logContainer.firstChild);
+            }
+            
+            // Автоскролл к новому сообщению
+            logContainer.scrollTop = logContainer.scrollHeight;
+        }
+
+        // Функция для случайного глюка текста
+        function glitchText(element, chance = 0.02) {
+            if (Math.random() < chance) {
+                const originalText = element.textContent;
+                const glitchedChars = '01#%&*+-=/';
+                let glitchedText = '';
+                for (let i = 0; i < originalText.length; i++) {
+                    glitchedText += Math.random() < 0.3 ? glitchedChars[Math.floor(Math.random() * glitchedChars.length)] : originalText[i];
+                }
+                element.textContent = glitchedText;
+                element.classList.add('glitch');
+
+                setTimeout(() => {
+                    element.textContent = originalText;
+                    element.classList.remove('glitch');
+                }, 100);
+            }
+        }
+
+        // Функция обновления счетчика
+        function updateCountdown() {
+            const now = new Date();
+            const totalDuration = endDate - startDate;
+            const elapsed = now - startDate;
+            const timeLeft = endDate - now;
+
+            // Расчет процентов
+            let percentage = Math.min(Math.max((elapsed / totalDuration) * 100, 0), 100);
+            if (now < startDate) percentage = 0;
+            if (now > endDate) percentage = 100;
+
+            // Обновление процентов и прогресс-бара
+            percentageEl.textContent = `${percentage.toFixed(1)}%`;
+            progressFillEl.style.width = `${percentage}%`;
+
+            // Проверка триггерных сообщений
+            const roundedPercent = Math.floor(percentage);
+            if (triggerMessages[roundedPercent] && !shownTriggers.has(roundedPercent)) {
+                const trigger = triggerMessages[roundedPercent];
+                addLogMessage(trigger.text, trigger.type);
+                shownTriggers.add(roundedPercent);
+                
+                // Специальные эффекты для важных триггеров
+                if (roundedPercent >= 50) {
+                    document.body.style.animation = 'none';
+                    setTimeout(() => {
+                        document.body.style.animation = 'pulse 0.5s';
+                    }, 10);
+                }
+            }
+
+            // Случайные комментарии (частота зависит от процента)
+            let commentChance = 0.01 + (percentage / 5000); // От 1% до 3%
+            
+            if (Math.random() < commentChance) {
+                let commentPool;
+                if (percentage > 70 && Math.random() < 0.4) {
+                    commentPool = warningComments;
+                } else if (percentage > 50 && Math.random() < 0.3) {
+                    commentPool = anomalyComments;
+                } else {
+                    commentPool = randomComments;
+                }
+                
+                const comment = commentPool[Math.floor(Math.random() * commentPool.length)];
+                addLogMessage(comment, 
+                    commentPool === warningComments ? 'warning' : 
+                    commentPool === anomalyComments ? 'anomaly' : '');
+            }
+
+            // Цвет процентов в зависимости от значения
+            if (percentage < 25) {
+                percentageEl.style.color = '#0f0';
+                percentageEl.style.textShadow = '0 0 20px #0f0';
+            } else if (percentage < 50) {
+                percentageEl.style.color = '#aaff00';
+                percentageEl.style.textShadow = '0 0 20px #aaff00';
+            } else if (percentage < 75) {
+                percentageEl.style.color = '#ffaa00';
+                percentageEl.style.textShadow = '0 0 20px #ffaa00';
+            } else if (percentage < 95) {
+                percentageEl.style.color = '#ff5500';
+                percentageEl.style.textShadow = '0 0 20px #ff5500';
+            } else {
+                percentageEl.style.color = '#f00';
+                percentageEl.style.textShadow = '0 0 20px #f00, 0 0 30px #f00';
+            }
+
+            // Обновление таймера
+            if (timeLeft > 0) {
+                const days = Math.floor(timeLeft / (1000 * 60 * 60 * 24));
+                const hours = Math.floor((timeLeft % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+                const minutes = Math.floor((timeLeft % (1000 * 60 * 60)) / (1000 * 60));
+                const seconds = Math.floor((timeLeft % (1000 * 60)) / 1000);
+
+                timerEl.textContent = `${days.toString().padStart(2, '0')}:${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                
+                // Цвет таймера в зависимости от оставшегося времени
+                if (days < 1) {
+                    timerEl.style.color = '#f00';
+                    timerEl.style.textShadow = '0 0 15px #f00';
+                } else if (days < 3) {
+                    timerEl.style.color = '#ff5500';
+                    timerEl.style.textShadow = '0 0 12px #ff5500';
+                }
+            } else {
+                timerEl.textContent = '00:00:00:00';
+                timerEl.style.color = '#f00';
+                timerEl.style.textShadow = '0 0 20px #f00';
+                addLogMessage(">> СИСТЕМА: КОРРЕКЦИЯ НАЧАЛАСЬ. ПРОТОКОЛ ЗАВЕРШЕН.", "important");
+            }
+
+            // Случайные глюки (чаще при высоких процентах)
+            const glitchChance = 0.02 + (percentage / 2000);
+            glitchText(percentageEl, glitchChance);
+            glitchText(timerEl, glitchChance * 0.7);
+            glitchText(protocolTitle, glitchChance * 0.3);
+
+            lastPercentage = percentage;
+        }
+
+        // Дополнительные эффекты
+        setInterval(() => {
+            if (Math.random() < 0.1) {
+                document.body.style.filter = `hue-rotate(${Math.random() * 30 - 15}deg) brightness(${0.9 + Math.random() * 0.2})`;
+                setTimeout(() => {
+                    document.body.style.filter = 'none';
+                }, 300);
+            }
+            
+            // Редкие системные сообщения
+            if (Math.random() < 0.003) {
+                const sysMessages = [
+                    "> СИСТЕМА: Самодиагностика... норма.",
+                    "> СИСТЕМА: Целостность данных подтверждена.",
+                    "> СИСТЕМА: Внешние подключения: 0.",
+                    "> СИСТЕМА: Энергопотребление: стабильное.",
+                    "> СИСТЕМА: Защитные барьеры: активны."
+                ];
+                addLogMessage(sysMessages[Math.floor(Math.random() * sysMessages.length)], "system");
+            }
+        }, 2000);
+
+        // Запуск обновления
+        setInterval(updateCountdown, 1000);
+        updateCountdown(); // Первоначальный вызов
+
+        // Начальные сообщения
+        setTimeout(() => addLogMessage("> Принцип неопределенности соблюдается. Наблюдатели не влияют."), 1000);
+        setTimeout(() => addLogMessage("> Ожидание финального подтверждения от источника..."), 3000);
+    </script>
+</body>
+</html>
